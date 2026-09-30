@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>🧳 12 Чемоданчиков Знаний</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', 'Comic Sans MS', sans-serif;
+    background: radial-gradient(ellipse at center, #1a237e 0%, #0d1440 55%, #05081a 100%);
+    min-height: 100vh;
+    padding: 12px;
+    color: #fff;
+    user-select: none;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ===== Сетка-фон ===== */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 215, 0, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 215, 0, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ===== Искры ===== */
+  .sparkles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .sparkle {
+    position: absolute;
+    color: #ffd700;
+    animation: sparkleAnim 4s infinite ease-in-out;
+    text-shadow: 0 0 10px #ffd700;
+  }
+  @keyframes sparkleAnim {
+    0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+  }
+
+  /* ===== Заголовок ===== */
+  h1 {
+    font-size: 1.9em;
+    text-align: center;
+    background: linear-gradient(90deg, #ffd700, #ffaa00, #ffd700, #ffaa00);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.7));
+    animation: shine 3s linear infinite;
+    margin-bottom: 4px;
+    z-index: 2;
+    position: relative;
+  }
+  @keyframes shine { to { background-position: 200% center; } }
+
+  .subtitle {
+    text-align: center;
+    color: #a8c8e8;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+    z-index: 2;
+    position: relative;
+  }
+
+  /* ===== HUD ===== */
+  .hud {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    z-index: 2;
+    position: relative;
+  }
+  .hud-item {
+    background: rgba(255, 215, 0, 0.12);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    border-radius: 12px;
+    padding: 6px 16px;
+    font-weight: bold;
+    font-size: 0.92em;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.25);
+  }
+  .hud-item span { color: #ffd700; }
+
+  /* ===== Сетка чемоданчиков ===== */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    max-width: 900px;
+    margin: 0 auto;
+    z-index: 2;
+    position: relative;
+  }
+
+  /* ===== Чемоданчик ===== */
+  .suitcase {
+    position: relative;
+    aspect-ratio: 1/1;
+    border-radius: 16px;
+    background:
+      linear-gradient(145deg, #8b5a2b 0%, #6b3f1a 50%, #4a2a0f 100%);
+    border: 4px solid #3a2208;
+    cursor: pointer;
+    box-shadow:
+      inset 0 0 25px rgba(0,0,0,0.5),
+      0 6px 0 #2a1505,
+      0 10px 20px rgba(0,0,0,0.6);
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+  }
+
+  /* Ручка чемодана */
+  .suitcase::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40%;
+    height: 18px;
+    border: 5px solid #3a2208;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    background: linear-gradient(180deg, #6b4d08, #3a2208);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    z-index: 1;
+  }
+
+  /* Полоски-застёжки */
+  .suitcase::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 8%;
+    right: 8%;
+    height: 6px;
+    background: linear-gradient(180deg, #ffd700, #b8860b);
+    border-radius: 3px;
+    transform: translateY(-50%);
+    box-shadow:
+      0 0 8px rgba(255, 215, 0, 0.6),
+      inset 0 1px 0 rgba(255,255,255,0.5);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Уголки чемодана */
+  .suitcase .corner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(145deg, #d4af37, #8b6914);
+    border: 2px solid #3a2208;
+    border-radius: 3px;
+    z-index: 2;
+  }
+  .suitcase .corner.tl { top: 6px; left: 6px; }
+  .suitcase .corner.tr { top: 6px; right: 6px; }
+  .suitcase .corner.bl { bottom: 6px; left: 6px; }
+  .suitcase .corner.br { bottom: 6px; right: 6px; }
+
+  /* Номер чемоданчика */
+  .suitcase .num {
+    position: relative;
+    z-index: 3;
+    font-size: 1.8em;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow:
+      0 0 15px rgba(255, 215, 0, 0.8),
+      2px 2px 0 #3a2208;
+    letter-spacing: 1px;
+  }
+
+  .suitcase:hover:not(.locked):not(.opened) {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow:
+      inset 0 0 25px rgba(0,0,0,0.5),
+      0 12px 0 #2a1505,
+      0 18px 30px rgba(0,0,0,0.6),
+      0 0 40px rgba(255, 215, 0, 0.7);
+  }
+
+  .suitcase:active:not(.locked):not(.opened) {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 0 25px rgba(0,0,0,0.5),
+      0 4px 0 #2a1505,
+      0 0 25px rgba(255, 215, 0, 0.6);
+  }
+
+  /* Открытый чемодан (правильный ответ) */
+  .suitcase.opened {
+    background: linear-gradient(145deg, #43a047, #1b5e20);
+    border-color: #00e676;
+    cursor: default;
+    animation: openPop 0.7s cubic-bezier(0.5, 1.8, 0.5, 1);
+    box-shadow:
+      inset 0 0 25px rgba(0,0,0,0.3),
+      0 6px 0 #0d3d1a,
+      0 0 40px rgba(0, 230, 118, 0.9);
+  }
+  .suitcase.opened::after {
+    background: linear-gradient(180deg, #a5ffb0, #00c853);
+  }
+  .suitcase.opened .num::after {
+    content: ' ✓';
+    color: #fff;
+    text-shadow: 0 0 10px #fff;
+  }
+  @keyframes openPop {
+    0% { transform: scale(1); }
+    45% { transform: scale(1.15) rotate(4deg); }
+    100% { transform: scale(1) rotate(0); }
+  }
+
+  /* Закрытый на цепь (2 ошибки) */
+  .suitcase.locked {
+    background: linear-gradient(145deg, #2a2a2a, #111);
+    border-color: #444;
+    cursor: not-allowed;
+    box-shadow:
+      inset 0 0 25px rgba(0,0,0,0.9),
+      0 6px 0 #000,
+      0 0 20px rgba(255, 23, 68, 0.4);
+  }
+  .suitcase.locked::after {
+    background: linear-gradient(180deg, #666, #333);
+  }
+  .suitcase.locked .num {
+    color: #666;
+    text-shadow: none;
+  }
+  .suitcase.locked .num::after {
+    content: ' ⛓️';
+    font-size: 0.8em;
+  }
+  /* Цепи поверх чемодана */
+  .suitcase.locked .chains {
+    position: absolute;
+    inset: -4px;
+    border-radius: 16px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 5;
+  }
+  .suitcase.locked .chains::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -10%;
+    right: -10%;
+    height: 14px;
+    background:
+      repeating-linear-gradient(90deg,
+        #888 0 8px, transparent 8px 10px,
+        #555 10px 18px, transparent 18px 20px);
+    transform: translateY(-50%) rotate(-25deg);
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    border-top: 2px solid #aaa;
+    border-bottom: 2px solid #333;
+  }
+  .suitcase.locked .chains::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -10%;
+    right: -10%;
+    height: 14px;
+    background:
+      repeating-linear-gradient(90deg,
+        #888 0 8px, transparent 8px 10px,
+        #555 10px 18px, transparent 18px 20px);
+    transform: translateY(-50%) rotate(25deg);
+    box-shadow: 0 0 10px rgba(0,0,0,0.8);
+    border-top: 2px solid #aaa;
+    border-bottom: 2px solid #333;
+  }
+
+  /* Замок ⛓️ по центру при закрытии */
+  .suitcase.locked .lock-icon {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2.2em;
+    z-index: 6;
+    filter: drop-shadow(0 0 10px #ff1744);
+    animation: lockAppear 0.6s;
+  }
+  @keyframes lockAppear {
+    0% { transform: translate(-50%, -50%) scale(0) rotate(-180deg); opacity: 0; }
+    60% { transform: translate(-50%, -50%) scale(1.3) rotate(10deg); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1) rotate(0); opacity: 1; }
+  }
+
+  /* ===== Модальное окно ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 15px;
+    animation: fadeIn 0.3s;
+  }
+  .modal-overlay.show { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .modal {
+    background:
+      linear-gradient(145deg, #1e3a5f, #0f1e33);
+    border: 4px solid #ffd700;
+    border-radius: 24px;
+    padding: 25px 22px;
+    max-width: 480px;
+    width: 100%;
+    box-shadow:
+      0 0 60px rgba(255, 215, 0, 0.7),
+      inset 0 0 40px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    animation: modalIn 0.4s cubic-bezier(0.5, 1.6, 0.5, 1);
+    position: relative;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.7) translateY(30px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-suitcase-num {
+    display: inline-block;
+    background: linear-gradient(145deg, #ffd700, #b8860b);
+    color: #2a1505;
+    font-weight: 900;
+    font-size: 0.95em;
+    padding: 4px 16px;
+    border-radius: 30px;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 0 #6b4d08;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .modal-question {
+    font-size: 2.4em;
+    font-weight: 900;
+    color: #ffd700;
+    margin: 12px 0 6px;
+    text-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+    letter-spacing: 1px;
+  }
+
+  .modal-ask {
+    color: #a8c8e8;
+    font-size: 0.95em;
+    margin-bottom: 18px;
+  }
+
+  /* ===== Варианты ответов ===== */
+  .options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .option {
+    background: linear-gradient(145deg, #2e4a6e, #1a2c44);
+    border: 3px solid #4a6a8e;
+    border-radius: 14px;
+    padding: 16px 10px;
+    color: #fff;
+    font-weight: 900;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: all 0.18s;
+    box-shadow: 0 5px 0 #0f1e33;
+    position: relative;
+    letter-spacing: 0.5px;
+  }
+  .option:hover:not(.disabled):not(.correct):not(.wrong) {
+    transform: translateY(-4px);
+    background: linear-gradient(145deg, #3e5a7e, #2a3c54);
+    box-shadow: 0 9px 0 #0f1e33, 0 0 25px rgba(255, 215, 0, 0.6);
+    border-color: #ffd700;
+  }
+  .option:active:not(.disabled):not(.correct):not(.wrong) {
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 #0f1e33;
+  }
+
+  .option.correct {
+    background: linear-gradient(145deg, #43a047, #1b5e20);
+    border-color: #00e676;
+    box-shadow: 0 5px 0 #0d3d1a, 0 0 30px rgba(0, 230, 118, 1);
+    animation: optCorrect 0.5s;
+  }
+  @keyframes optCorrect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .option.wrong {
+    background: linear-gradient(145deg, #d50000, #7b0000);
+    border-color: #ff1744;
+    box-shadow: 0 5px 0 #4a0000, 0 0 30px rgba(255, 23, 68, 1);
+    animation: optWrong 0.4s;
+  }
+  @keyframes optWrong {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+  }
+
+  .option.disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+
+  /* ===== Обратная связь в модальном окне ===== */
+  .modal-feedback {
+    font-size: 1.1em;
+    font-weight: bold;
+    min-height: 1.5em;
+    margin-top: 6px;
+    color: #ffd700;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+  }
+  .modal-feedback.good { color: #66ff88; text-shadow: 0 0 15px #00e676; }
+  .modal-feedback.bad  { color: #ff6b6b; text-shadow: 0 0 15px #ff1744; }
+
+  /* ===== Финальный экран ===== */
+  .final-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle, rgba(20, 20, 60, 0.97), rgba(5, 5, 20, 0.99));
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+    z-index: 300;
+    animation: fadeIn 0.5s;
+  }
+  .final-overlay.show { display: flex; }
+
+  .final-card {
+    background: linear-gradient(145deg, #1e3a5f, #0f1e33);
+    border: 5px solid #ffd700;
+    border-radius: 28px;
+    padding: 30px 26px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 0 70px rgba(255, 215, 0, 0.8);
+    animation: modalIn 0.6s cubic-bezier(0.5, 1.6, 0.5, 1);
+  }
+
+  .final-emoji { font-size: 4.5em; margin-bottom: 8px; display: block; }
+  .final-emoji.great { animation: spin 3s infinite linear; }
+  @keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+
+  .final-title {
+    font-size: 2.1em;
+    font-weight: 900;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, #ffd700, #ffaa00, #ffd700);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    animation: shine 2s linear infinite;
+  }
+
+  .final-score {
+    font-size: 3.2em;
+    font-weight: 900;
+    color: #ffd700;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.9);
+    margin: 8px 0;
+  }
+  .final-score small { font-size: 0.4em; color: #a8c8e8; text-shadow: none; }
+
+  .final-stats {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    margin: 16px 0;
+    flex-wrap: wrap;
+  }
+  .final-stat {
+    background: rgba(255, 215, 0, 0.1);
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    border-radius: 14px;
+    padding: 8px 16px;
+    font-size: 0.95em;
+    font-weight: bold;
+  }
+  .final-stat span { color: #ffd700; font-size: 1.15em; }
+
+  .final-message {
+    color: #d0e8ff;
+    font-size: 1.05em;
+    line-height: 1.5;
+    margin: 14px 0 20px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 14px;
+    border-left: 4px solid #ffd700;
+    text-align: left;
+  }
+
+  .btn-final {
+    padding: 14px 34px;
+    font-size: 1.05em;
+    font-weight: bold;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    background: linear-gradient(145deg, #43a047, #1b5e20);
+    color: #fff;
+    box-shadow: 0 6px 0 #0d3d1a, 0 0 30px rgba(0, 230, 118, 0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+  .btn-final:hover { transform: translateY(-3px); box-shadow: 0 9px 0 #0d3d1a, 0 0 40px rgba(0, 230, 118, 1); }
+  .btn-final:active { transform: translateY(2px); box-shadow: 0 2px 0 #0d3d1a; }
+
+  /* ===== Адаптив ===== */
+  @media (max-width: 700px) {
+    h1 { font-size: 1.4em; }
+    .grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .suitcase .num { font-size: 1.4em; }
+    .suitcase::before { height: 14px; border-width: 4px; }
+    .modal-question { font-size: 1.9em; }
+    .option { font-size: 1.1em; padding: 13px 8px; }
+    .final-title { font-size: 1.6em; }
+    .final-score { font-size: 2.6em; }
+  }
+  @media (max-width: 420px) {
+    .grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .suitcase .num { font-size: 1.1em; }
+    .suitcase .corner { width: 12px; height: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sparkles" id="sparkles"></div>
+
+<h1>🧳 12 Чемоданчиков Знаний</h1>
+<p class="subtitle">Открой чемоданчик и ответь на вопрос. С первой попытки — 10 баллов, со второй — 5!</p>
+
+<div class="hud">
+  <div class="hud-item">🏆 Баллов: <span id="score">0</span></div>
+  <div class="hud-item">✅ Открыто: <span id="opened">0</span>/12</div>
+  <div class="hud-item">⛓️ Закрыто: <span id="locked">0</span></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<!-- ===== Модальное окно ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-suitcase-num" id="modalSuitNum">Чемоданчик №1</div>
+    <div class="modal-question" id="modalQuestion">sin 30° = ?</div>
+    <div class="modal-ask" id="modalAsk">Выбери правильный ответ:</div>
+    <div class="options" id="options"></div>
+    <div class="modal-feedback" id="modalFeedback"></div>
+  </div>
+</div>
+
+<!-- ===== Финальный экран ===== -->
+<div class="final-overlay" id="finalOverlay">
+  <div class="final-card">
+    <span class="final-emoji" id="finalEmoji">🎉</span>
+    <div class="final-title" id="finalTitle">ИГРА ОКОНЧЕНА!</div>
+    <div class="final-score" id="finalScore">0 <small>баллов</small></div>
+    <div class="final-stats">
+      <div class="final-stat">✅ Открыто: <span id="finalOpened">0</span>/12</div>
+      <div class="final-stat">⛓️ Закрыто: <span id="finalLocked">0</span></div>
+      <div class="final-stat">🎯 С первой попытки: <span id="finalFirst">0</span></div>
+    </div>
+    <div class="final-message" id="finalMessage"></div>
+    <button class="btn-final" onclick="location.reload()">🔄 Играть снова</button>
+  </div>
+</div>
+
+<script>
+/* ============ Искры ============ */
+const sparklesContainer = document.getElementById('sparkles');
+const symbols = ['✦', '✧', '⭐', '✨', '·', '💫'];
+for (let i = 0; i < 35; i++) {
+  const s = document.createElement('div');
+  s.className = 'sparkle';
+  s.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+  s.style.left = Math.random() * 100 + '%';
+  s.style.top = Math.random() * 100 + '%';
+  s.style.animationDelay = Math.random() * 4 + 's';
+  s.style.animationDuration = (3 + Math.random() * 3) + 's';
+  s.style.fontSize = (0.6 + Math.random() * 1.2) + 'em';
+  sparklesContainer.appendChild(s);
+}
+
+/* ============ Данные — таблица значений ============ */
+const allQuestions = [
+  { q: 'sin 30°', a: '1/2' },
+  { q: 'cos 30°', a: '√3/2' },
+  { q: 'tg 30°',  a: '√3/3' },
+  { q: 'ctg 30°', a: '√3' },
+  { q: 'sin 45°', a: '√2/2' },
+  { q: 'cos 45°', a: '√2/2' },
+  { q: 'tg 45°',  a: '1' },
+  { q: 'ctg 45°', a: '1' },
+  { q: 'sin 60°', a: '√3/2' },
+  { q: 'cos 60°', a: '1/2' },
+  { q: 'tg 60°',  a: '√3' },
+  { q: 'ctg 60°', a: '√3/3' },
+];
+
+/* Все возможные варианты ответов (пул для дистракторов) */
+const allAnswers = ['1/2', '√3/2', '√3/3', '√3', '√2/2', '1'];
+
+/* ============ Состояние ============ */
+let state = {
+  score: 0,
+  opened: 0,
+  locked: 0,
+  firstTry: 0,
+  currentIndex: -1,
+  currentAttempt: 1, // 1 или 2
+  answered: 0, // сколько чемоданчиков уже завершено (открыто + закрыто)
+  gameOver: false,
+};
+
+let suitcases = []; // массив данных каждого чемоданчика
+
+/* ============ DOM ============ */
+const gridEl = document.getElementById('grid');
+const scoreEl = document.getElementById('score');
+const openedEl = document.getElementById('opened');
+const lockedEl = document.getElementById('locked');
+const modalOverlay = document.getElementById('modalOverlay');
+const modalSuitNum = document.getElementById('modalSuitNum');
+const modalQuestion = document.getElementById('modalQuestion');
+const modalAsk = document.getElementById('modalAsk');
+const optionsEl = document.getElementById('options');
+const modalFeedback = document.getElementById('modalFeedback');
+const finalOverlay = document.getElementById('finalOverlay');
+
+/* ============ Звуки ============ */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(type) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const now = audioCtx.currentTime;
+
+  if (type === 'correct') {
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const t = now + i * 0.07;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.22, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + 0.32);
+    });
+  } else if (type === 'wrong') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(200, now);
+    osc.frequency.exponentialRampToValueAtTime(70, now + 0.4);
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(now); osc.stop(now + 0.5);
+  } else if (type === 'lock') {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.exponentialRampToValueAtTime(55, now + 0.3);
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(now); osc.stop(now + 0.45);
+  } else if (type === 'victory') {
+    const notes = [523.25, 659.25, 783.99, 1046.5, 1318.5, 1046.5, 1318.5];
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.value = freq;
+      const t = now + i * 0.13;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.25, t + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + 0.35);
+    });
+  } else if (type === 'sad') {
+    const notes = [392, 349.23, 293.66, 261.63];
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const t = now + i * 0.18;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.2, t + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(t); osc.stop(t + 0.45);
+    });
+  }
+}
+
+/* ============ Утилиты ============ */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ============ Создание поля ============ */
+function buildGame() {
+  // Перемешаем вопросы
+  const shuffledQuestions = shuffle(allQuestions);
+
+  suitcases = shuffledQuestions.map((item, idx) => ({
+    index: idx,
+    question: item.q,
+    answer: item.a,
+    attempts: 0,
+    status: 'closed', // closed | opened | locked
+  }));
+
+  gridEl.innerHTML = '';
+  suitcases.forEach((sc, i) => {
+    const el = document.createElement('div');
+    el.className = 'suitcase';
+    el.dataset.index = i;
+    el.innerHTML = `
+      <span class="corner tl"></span>
+      <span class="corner tr"></span>
+      <span class="corner bl"></span>
+      <span class="corner br"></span>
+      <div class="num">${i + 1}</div>
+      <div class="chains"></div>
+      <div class="lock-icon" style="display:none;">⛓️</div>
+    `;
+    el.addEventListener('click', () => openSuitcase(i));
+    gridEl.appendChild(el);
+  });
+}
+
+/* ============ Открытие чемоданчика ============ */
+function openSuitcase(i) {
+  if (state.gameOver) return;
+  const sc = suitcases[i];
+  if (sc.status !== 'closed') return;
+
+  state.currentIndex = i;
+  state.currentAttempt = 1;
+  showModal(sc);
+}
+
+/* ============ Показать модальное окно с вопросом ============ */
+function showModal(sc) {
+  modalSuitNum.textContent = `Чемоданчик №${sc.index + 1}`;
+  modalQuestion.textContent = sc.question + ' = ?';
+  modalAsk.textContent = state.currentAttempt === 1
+    ? 'Первая попытка — выбери правильный ответ (10 баллов):'
+    : 'Вторая попытка — будь внимателен! (5 баллов):';
+  modalFeedback.textContent = '';
+  modalFeedback.className = 'modal-feedback';
+
+  // Построить варианты: правильный + 3 дистрактора
+  const wrongPool = allAnswers.filter(a => a !== sc.answer);
+  const shuffledWrong = shuffle(wrongPool);
+  const distractors = shuffledWrong.slice(0, 3);
+  const options = shuffle([sc.answer, ...distractors]);
+
+  optionsEl.innerHTML = '';
+  options.forEach(opt => {
+    const btn = document.createElement('div');
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.dataset.value = opt;
+    btn.addEventListener('click', () => chooseOption(btn, opt, sc));
+    optionsEl.appendChild(btn);
+  });
+
+  modalOverlay.classList.add('show');
+}
+
+/* ============ Выбор ответа ============ */
+function chooseOption(btn, value, sc) {
+  // Отключить повторные клики во время анимации
+  const allOpts = optionsEl.querySelectorAll('.option');
+  allOpts.forEach(o => o.classList.add('disabled'));
+
+  if (value === sc.answer) {
+    // ===== ПРАВИЛЬНО =====
+    btn.classList.remove('disabled');
+    btn.classList.add('correct');
+    playSound('correct');
+
+    const points = state.currentAttempt === 1 ? 10 : 5;
+    state.score += points;
+    scoreEl.textContent = state.score;
+
+    if (state.currentAttempt === 1) {
+      state.firstTry++;
+    }
+
+    modalFeedback.textContent = `✅ Правильно! +${points} баллов`;
+    modalFeedback.className = 'modal-feedback good';
+
+    // Через паузу закрыть модалку и открыть чемодан
+    setTimeout(() => {
+      finishSuitcase(sc, 'opened');
+      modalOverlay.classList.remove('show');
+    }, 1200);
+
+  } else {
+    // ===== НЕПРАВИЛЬНО =====
+    btn.classList.remove('disabled');
+    btn.classList.add('wrong');
+    playSound('wrong');
+
+    if (state.currentAttempt === 1) {
+      // Первая ошибка — попробовать ещё раз
+      state.currentAttempt = 2;
+      modalFeedback.textContent = '❌ Неверно! Осталась вторая попытка (5 баллов).';
+      modalFeedback.className = 'modal-feedback bad';
+
+      setTimeout(() => {
+        // Убрать wrong-подсветку и перейти ко второй попытке
+        showModal(sc);
+      }, 1400);
+    } else {
+      // Вторая ошибка — чемодан закрывается навсегда
+      modalFeedback.textContent = '💀 Увы! Чемоданчик закрыт на цепочки.';
+      modalFeedback.className = 'modal-feedback bad';
+      playSound('lock');
+
+      setTimeout(() => {
+        finishSuitcase(sc, 'locked');
+        modalOverlay.classList.remove('show');
+      }, 1400);
+    }
+  }
+}
+
+/* ============ Финализировать чемоданчик ============ */
+function finishSuitcase(sc, status) {
+  sc.status = status;
+  const el = gridEl.querySelector(`.suitcase[data-index="${sc.index}"]`);
+  if (!el) return;
+
+  if (status === 'opened') {
+    el.classList.add('opened');
+    state.opened++;
+    openedEl.textContent = state.opened;
+  } else {
+    el.classList.add('locked');
+    const lockIcon = el.querySelector('.lock-icon');
+    if (lockIcon) lockIcon.style.display = 'block';
+    state.locked++;
+    lockedEl.textContent = state.locked;
+  }
+
+  state.answered++;
+
+  // Проверка окончания игры
+  if (state.answered === suitcases.length) {
+    state.gameOver = true;
+    setTimeout(showFinal, 1000);
+  }
+}
+
+/* ============ Финальный экран ============ */
+function showFinal() {
+  const maxScore = 12 * 10; // 120
+  const score = state.score;
+  const percent = Math.round((score / maxScore) * 100);
+
+  document.getElementById('finalScore').innerHTML = `${score} <small>из ${maxScore} баллов</small>`;
+  document.getElementById('finalOpened').textContent = state.opened;
+  document.getElementById('finalLocked').textContent = state.locked;
+  document.getElementById('finalFirst').textContent = state.firstTry;
+
+  const emojiEl = document.getElementById('finalEmoji');
+  const titleEl = document.getElementById('finalTitle');
+  const msgEl = document.getElementById('finalMessage');
+
+  // === Обратная связь по баллам ===
+  if (score >= 110) {
+    // 110-120 — почти всё с первой попытки
+    emojiEl.textContent = '🏆';
+    emojiEl.className = 'final-emoji great';
+    titleEl.textContent = 'ВЫДАЮЩИЙСЯ РЕЗУЛЬТАТ!';
+    msgEl.innerHTML = `🌟 <b>Превосходно!</b> Ты знаешь таблицу тригонометрических значений на отлично!<br><br>
+      Почти все чемоданчики открыты с первой попытки, и ты заработал <b>${score}</b> из ${maxScore} баллов (${percent}%).<br><br>
+      💪 Ты настоящий математик! Продолжай в том же духе!`;
+    playSound('victory');
+  } else if (score >= 85) {
+    // 85-109 — хороший результат
+    emojiEl.textContent = '🎉';
+    emojiEl.className = 'final-emoji great';
+    titleEl.textContent = 'ОТЛИЧНЫЙ РЕЗУЛЬТАТ!';
+    msgEl.innerHTML = `😊 <b>Молодец!</b> Ты отлично справился с таблицей.<br><br>
+      Твой результат: <b>${score}</b> из ${maxScore} баллов (${percent}%).<br><br>
+      Некоторые задания потребовали второй попытки — это нормально! Повтори их ещё раз, чтобы запомнить навсегда.`;
+    playSound('victory');
+  } else if (score >= 55) {
+    // 55-84 — средний результат
+    emojiEl.textContent = '👍';
+    emojiEl.className = 'final-emoji';
+    titleEl.textContent = 'ХОРОШИЙ РЕЗУЛЬТАТ!';
+    msgEl.innerHTML = `💡 <b>Неплохо!</b> Ты справился с большинством заданий.<br><br>
+      Твой результат: <b>${score}</b> из ${maxScore} баллов (${percent}%).<br><br>
+      Рекомендую повторить таблицу ещё раз — особенно те значения, где ты ошибался. У тебя всё получится!`;
+    playSound('correct');
+  } else if (score >= 25) {
+    // 25-54 — ниже среднего
+    emojiEl.textContent = '📚';
+    emojiEl.className = 'final-emoji';
+    titleEl.textContent = 'ЕСТЬ НАД ЧЕМ ПОРАБОТАТЬ';
+    msgEl.innerHTML = `🤔 <b>Не расстраивайся!</b> Таблица тригонометрии требует тренировки.<br><br>
+      Твой результат: <b>${score}</b> из ${maxScore} баллов (${percent}%).<br><br>
+      💡 <b>Совет:</b> повтори таблицу значений для 30°, 45° и 60°, обрати внимание на закономерности:
+      <br>• sin 30° = 1/2 = cos 60°
+      <br>• sin 60° = √3/2 = cos 30°
+      <br>• tg 45° = ctg 45° = 1
+      <br><br>Попробуй ещё раз — обязательно получится!`;
+    playSound('sad');
+  } else {
+    // 0-24 — совсем плохо
+    emojiEl.textContent = '😔';
+    emojiEl.className = 'final-emoji';
+    titleEl.textContent = 'НУЖНО ПОВТОРИТЬ ТАБЛИЦУ';
+    msgEl.innerHTML = `📖 <b>Не переживай!</b> У всех бывает начало.<br><br>
+      Твой результат: <b>${score}</b> из ${maxScore} баллов (${percent}%).<br><br>
+      💡 <b>Что делать:</b> открой учебник и выучи таблицу значений sin, cos, tg, ctg для углов 30°, 45° и 60°.
+      Запомни главные значения, а потом возвращайся — я уверен, ты справишься намного лучше!<br><br>
+      🌱 Каждый эксперт когда-то был новичком!`;
+    playSound('sad');
+  }
+
+  finalOverlay.classList.add('show');
+}
+
+/* ============ Старт ============ */
+window.addEventListener('load', () => {
+  setTimeout(buildGame, 300);
+});
+</script>
+
+</body>
+</html>
